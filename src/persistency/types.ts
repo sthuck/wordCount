@@ -1,10 +1,10 @@
 export interface Word {
-  key: string;
+  id: string;
   count: number;
 }
 
 export interface Job {
-  key: string;
+  id: string;
   status: JobStatus;
   reason?: string;
 }
@@ -15,13 +15,13 @@ export enum JobStatus {
 }
 export interface WordRepository {
   writeWord(word: Word): Promise<void>;
-  readWord(key: string): Promise<Omit<Word, 'key'>>;
+  readWord(id: string): Promise<Omit<Word, 'id'>>;
   getTop(howMany: number): Promise<Word[]>;
-  addBulkWordCounts(counts: [key: string, count: number][]): Promise<void>;
+  addBulkWordCounts(counts: [id: string, count: number][]): Promise<void>;
 }
 
 export interface JobRepository {
   writeJob(JobStatus: Job): Promise<void>;
   updateJob(JobStatus: Job): Promise<void>;
-  readJob(key: string): Promise<Job>;
+  readJob(id: string): Promise<Job>;
 }

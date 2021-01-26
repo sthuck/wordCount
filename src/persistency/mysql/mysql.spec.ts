@@ -26,14 +26,14 @@ describe('MysqlWordRepository', () => {
   });
 
   it('basic get/save', async () => {
-    await repo.writeWord({ key: 'a', count: 5 });
+    await repo.writeWord({ id: 'a', count: 5 });
 
     let { count } = await repo.readWord('a');
     expect(count).toEqual(5);
   });
 
   it('addBulkWordCounts', async () => {
-    await repo.writeWord({ key: 'a', count: 5 });
+    await repo.writeWord({ id: 'a', count: 5 });
     await repo.addBulkWordCounts([
       ['a', 2],
       ['b', 6],
@@ -55,7 +55,7 @@ describe('MysqlWordRepository', () => {
     ]);
 
     const top2 = await repo.getTop(2);
-    expect(top2.map((w) => w.key)).toEqual(['d', 'b']);
+    expect(top2.map((w) => w.id)).toEqual(['d', 'b']);
   });
 
   afterAll(async () => {

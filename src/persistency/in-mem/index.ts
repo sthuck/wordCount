@@ -1,15 +1,15 @@
 import { Job, JobRepository, Word, WordRepository } from '../types';
 
-class BaseInMemRepository<T extends { key: string }> {
+class BaseInMemRepository<T extends { id: string }> {
   protected storage: Record<string, T> = {};
 
   protected writeEntity(item: T) {
-    this.storage[item.key] = item;
+    this.storage[item.id] = item;
     return Promise.resolve();
   }
 
-  protected readEntity(key: string): Promise<T> {
-    return Promise.resolve(this.storage[key]);
+  protected readEntity(id: string): Promise<T> {
+    return Promise.resolve(this.storage[id]);
   }
 }
 export class InMemWordRepository extends BaseInMemRepository<Word> implements WordRepository {
@@ -17,11 +17,11 @@ export class InMemWordRepository extends BaseInMemRepository<Word> implements Wo
 
   readWord = this.readEntity;
 
-  addBulkWordCounts(counts: [key: string, count: number][]): Promise<void> {
-    counts.forEach(([key, count]) => {
-      const item = this.storage[key] || { key, count: 0 };
+  addBulkWordCounts(counts: [id: string, count: number][]): Promise<void> {
+    counts.forEach(([id, count]) => {
+      const item = this.storage[id] || { id: id, count: 0 };
       item.count += count;
-      this.storage[key] = item;
+      this.storage[id] = item;
     });
     return Promise.resolve();
   }

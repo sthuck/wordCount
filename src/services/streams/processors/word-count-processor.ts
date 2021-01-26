@@ -47,7 +47,7 @@ export class WordCountStreamProcessor extends StreamProcessor {
   async onStreamCreate(resolve: Function) {
     this.jobId = uuidV4();
     await this.jobRepo.writeJob({
-      key: this.jobId,
+      id: this.jobId,
       status: JobStatus.Progress,
     });
 
@@ -74,14 +74,14 @@ export class WordCountStreamProcessor extends StreamProcessor {
           aStream.resume();
         })
         .catch((e) => {
-          logger.log('Error in persisting words', e);
+          logger('Error in persisting words', e);
           aStream.destroy(e);
         });
     }
   }
 
   protected async onStreamError(reason: any, reject: Function) {
-    await this.jobRepo.updateJob({ key: this.jobId, status: JobStatus.Failed, reason: reason?.toString() });
+    await this.jobRepo.updateJob({ id: this.jobId, status: JobStatus.Failed, reason: reason?.toString() });
   }
 
   protected onStreamEnd(resolve: Function, reject: Function) {
@@ -91,11 +91,11 @@ export class WordCountStreamProcessor extends StreamProcessor {
 
     this.persistWords()
       .catch((e) => {
-        logger.log('Error in persisting words', e);
+        logger('Error in persisting words', e);
         this.onStreamError(e, reject);
       })
       .then(() => {
-        this.jobRepo.updateJob({ key: this.jobId, status: JobStatus.Success });
+        this.jobRepo.updateJob({ id: this.jobId, status: JobStatus.Success });
       });
   }
 }

@@ -17,8 +17,8 @@ export const wordCounterApi = (streamProcessorFactory: StreamProcessorFactory) =
       const request = httpRequestToStreamRequest(req);
 
       const stream = await streamRequestHandler.createStream(request);
-      await streamRequestHandler.processStream(stream);
-      res.send('ok');
+      const jobId = await streamRequestHandler.processStream(stream);
+      res.send({ jobId });
     }),
   );
 };

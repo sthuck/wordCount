@@ -4,7 +4,7 @@ import { loggerFactory } from '../../utils/logger';
 import { Word, WordRepository } from '../types';
 import { BaseMysqlRepository } from './base';
 
-const schema = fs.readFileSync(__dirname + '/word_schema.sql', 'utf-8');
+const schema = fs.readFileSync(__dirname.replace('/dist', '') + '/word_schema.sql', 'utf-8');
 const TABLE_NAME = 'word_count';
 const logger = loggerFactory('MysqlWordRepository');
 
@@ -20,21 +20,21 @@ export class MysqlWordRepository extends BaseMysqlRepository implements WordRepo
     await this.knex.insert(word).into(TABLE_NAME);
   }
 
-  async readWord(key: string): Promise<Pick<Word, 'count'>> {
-    const result = await this.knex<Word>(TABLE_NAME).select('count').where({ key });
+  async readWord(id: string): Promise<Pick<Word, 'count'>> {
+    const result = await this.knex<Word>(TABLE_NAME).select('count').where({ id });
 
     return result?.[0];
   }
 
-  addBulkWordCounts(counts: [key: string, count: number][]): Promise<void> {
-    const itemsSql = counts.map(([key, count]) => this.knex.raw('( ?, ? )', [count, key])).join(', ');
-    const query = this.knex.raw(
-      'INSERT INTO ?? (`count`, `key`) VALUES ' +
-        itemsSql +
-        ' as updates ON DUPLICATE KEY UPDATE `count` = updates.`count` + ??.`count`;',
-      [TABLE_NAME, TABLE_NAME],
-    );
-    return query.then((r) => r);
+  addBulkWordCounts(counts: [id: string, count: number][]): Promise<void> {
+    console.log(counts.filter((c) => c.length !== 2));
+    const itemsSql = counts.map(([id, count]) => this.knex.raw('( ?, ? )', [count, id])).join(', ');
+
+    const query =
+      this.knex.raw('INSERT INTO ?? (`count`, `id`) VALUES ', [TABLE_NAME]) +
+      itemsSql +
+      this.knex.raw(' as updates ON DUPLICATE KEY UPDATE `count` = updates.`count` + ??.`count`;', [TABLE_NAME]);
+    return this.knex.raw(query).then((r) => r);
   }
 
   getTop(howMany: number) {

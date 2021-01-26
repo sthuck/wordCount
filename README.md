@@ -1,9 +1,7 @@
 ## running
 
-npm run docker:pull
-npm run docker:default
-npm run build
-npm run app:default
+needs docker
+./start.sh
 
 ## quick overview
 
@@ -16,3 +14,7 @@ I mostly prefer not using an orm. ORMs can make it difficult to use all the feat
 ## Getting top X words
 
 seemed like it's a good
+
+## assumption I made along the way
+
+- parsing is very simple, I assume I only get simple text files
