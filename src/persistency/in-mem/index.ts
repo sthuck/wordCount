@@ -1,21 +1,43 @@
-import {Word, WordRepository} from '../types';
+import { Job, JobRepository, Word, WordRepository } from '../types';
 
-export class InMemWordRepository implements WordRepository {
-  private storage: Record<string, Word> = {};
-  writeWord(word: Word): Promise<void> {
-    this.storage[word.key] = word;
+class BaseInMemRepository<T extends { key: string }> {
+  protected storage: Record<string, T> = {};
+
+  protected writeEntity(item: T) {
+    this.storage[item.key] = item;
     return Promise.resolve();
   }
-  
-  readWord(key: string): Promise<Pick<Word, 'count'>> {
+
+  protected readEntity(key: string): Promise<T> {
     return Promise.resolve(this.storage[key]);
   }
+}
+export class InMemWordRepository extends BaseInMemRepository<Word> implements WordRepository {
+  writeWord = this.writeEntity;
 
-  addCountToWord(key: string, count: number): Promise<void> {
-    const item = this.storage[key] || {key, count: 0};
-    item.count += count;
-    this.storage[key] = item;
+  readWord = this.readEntity;
+
+  addBulkWordCounts(counts: [key: string, count: number][]): Promise<void> {
+    counts.forEach(([key, count]) => {
+      const item = this.storage[key] || { key, count: 0 };
+      item.count += count;
+      this.storage[key] = item;
+    });
     return Promise.resolve();
   }
-  
+
+  getTop(howMany: number) {
+    return Promise.resolve(
+      Object.entries(this.storage)
+        .sort(([, w1], [, w2]) => -1 * (w1.count - w2.count))
+        .slice(0, howMany)
+        .map(([, w]) => w),
+    );
+  }
+}
+
+export class InMemJobRepository extends BaseInMemRepository<Job> implements JobRepository {
+  writeJob = this.writeEntity;
+  readJob = this.readEntity;
+  updateJob = this.writeEntity;
 }

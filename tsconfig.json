@@ -1,10 +1,12 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "esnext",
-    "esModuleInterop": true
+    "target": "es2018",
+    "esModuleInterop": true,
+    "noErrorTruncation": true,
+    "strict": true,
+    "outDir": "./dist",
+    "incremental": true
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
