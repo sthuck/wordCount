@@ -27,7 +27,6 @@ export class MysqlWordRepository extends BaseMysqlRepository implements WordRepo
   }
 
   addBulkWordCounts(counts: [id: string, count: number][]): Promise<void> {
-    console.log(counts.filter((c) => c.length !== 2));
     const itemsSql = counts.map(([id, count]) => this.knex.raw('( ?, ? )', [count, id])).join(', ');
 
     const query =
